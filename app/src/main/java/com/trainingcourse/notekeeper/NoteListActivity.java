@@ -1,6 +1,8 @@
 package com.trainingcourse.notekeeper;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,7 +18,8 @@ import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
 
-    private ArrayAdapter<NoteInfo> mAdapterNotes;
+
+    private NoteRecyclerAdapter mNoteRecyclerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +40,12 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        mAdapterNotes.notifyDataSetChanged();
+        mNoteRecyclerAdapter.notifyDataSetChanged();
+        //mAdapterNotes.notifyDataSetChanged();
     }
 
     private void initializeDisplayContent() {
-        final ListView listNotes=findViewById(R.id.list_notes);
+      /*  final ListView listNotes=findViewById(R.id.list_notes);
 
         List<NoteInfo> notes=DataManager.getInstance().getNotes();
         mAdapterNotes = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,notes);
@@ -56,7 +60,15 @@ public class NoteListActivity extends AppCompatActivity {
                 Log.d("Debug",String.valueOf(position));
                 startActivity(intent);
             }
-        });
+        });*/
+
+        final RecyclerView recyclerNotes=(RecyclerView) findViewById(R.id.list_notes);
+        final LinearLayoutManager notesLayoutManager=new LinearLayoutManager(this);
+        recyclerNotes.setLayoutManager(notesLayoutManager);
+
+        List<NoteInfo> notes=DataManager.getInstance().getNotes();
+        mNoteRecyclerAdapter = new NoteRecyclerAdapter(this,notes);
+        recyclerNotes.setAdapter(mNoteRecyclerAdapter);
 
     }
 }
