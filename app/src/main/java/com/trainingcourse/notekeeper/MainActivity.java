@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         mNoteRecyclerAdapter = new NoteRecyclerAdapter(this,notes);
 
 
-        mCoursesLayoutManager = new GridLayoutManager(this,2);
+        mCoursesLayoutManager = new GridLayoutManager(this,getResources().getInteger(R.integer.course_grid_span));
         List<CourseInfo> courses=DataManager.getInstance().getCourses();
         mCourseRecyclerAdapter = new CourseRecyclerAdapter(this,courses);
 
