@@ -1,68 +1,59 @@
 package com.trainingcourse.notekeeper;
 
-import static com.trainingcourse.notekeeper.NoteKeeperDatabaseContract.*;
+import static com.trainingcourse.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
+import static com.trainingcourse.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.w3c.dom.Text;
-
-import java.util.List;
-
-public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder>{
+public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder> {
 
     private final Context mContext;
-    private final LayoutInflater mLayoutInflater;
     private Cursor mCursor;
+    private final LayoutInflater mLayoutInflater;
     private int mCoursePos;
     private int mNoteTitlePos;
     private int mIdPos;
 
-    public NoteRecyclerAdapter(Context context,Cursor cursor) {
+    public NoteRecyclerAdapter(Context context, Cursor cursor) {
         mContext = context;
-        mCursor=cursor;
-        mLayoutInflater = LayoutInflater.from(context);
+        mCursor = cursor;
+        mLayoutInflater = LayoutInflater.from(mContext);
         populateColumnPositions();
     }
 
     private void populateColumnPositions() {
-        if(mCursor==null) {
+        if(mCursor == null)
             return;
-        }//Get column index from mCursor
-        mCoursePos = mCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+        // Get column indexes from mCursor
+        mCoursePos = mCursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_TITLE);
         mNoteTitlePos = mCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         mIdPos = mCursor.getColumnIndex(NoteInfoEntry._ID);
     }
 
     public void changeCursor(Cursor cursor) {
-        if(mCursor!=null) {
+        if(mCursor != null)
             mCursor.close();
-        }
-        mCursor=cursor;
+        mCursor = cursor;
         populateColumnPositions();
         notifyDataSetChanged();
     }
 
-
-    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView =mLayoutInflater.inflate(R.layout.item_note_list,parent,false);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = mLayoutInflater.inflate(R.layout.item_note_list, parent, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String course = mCursor.getString(mCoursePos);
         String noteTitle = mCursor.getString(mNoteTitlePos);
@@ -70,19 +61,17 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
         holder.mTextCourse.setText(course);
         holder.mTextTitle.setText(noteTitle);
-        holder.mId=id;
+        holder.mId = id;
     }
-
     @Override
     public int getItemCount() {
-
-        return mCursor==null ? 0 : mCursor.getCount();
+        return mCursor == null ? 0 : mCursor.getCount();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView mTextCourse;
-        private final TextView mTextTitle;
+        public final TextView mTextCourse;
+        public final TextView mTextTitle;
         public int mId;
 
         public ViewHolder(View itemView) {
@@ -93,12 +82,11 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(mContext,NoteActivity.class);
-                    intent.putExtra(NoteActivity.NOTE_ID,mId);
+                    Intent intent = new Intent(mContext, NoteActivity.class);
+                    intent.putExtra(NoteActivity.NOTE_ID, mId);
                     mContext.startActivity(intent);
                 }
             });
         }
     }
-
 }
