@@ -10,6 +10,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.StrictMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        enableStrictMode();
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setSupportActionBar(findViewById(R.id.toolbar));
@@ -86,6 +91,16 @@ public class MainActivity extends AppCompatActivity
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
     }
 
+    private void enableStrictMode() {
+        if(BuildConfig.DEBUG) {
+            StrictMode.ThreadPolicy policy= new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build();
+            StrictMode.setThreadPolicy(policy);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         mDbOpenHelper.close();
@@ -99,6 +114,19 @@ public class MainActivity extends AppCompatActivity
         getLoaderManager().restartLoader(LOADER_NOTES, null, this);
 
         updateNavHeader();
+        openDrawer();
+    }
+
+    private void openDrawer() {
+        Handler handler=new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+                drawer.openDrawer(GravityCompat.START);
+            }
+        },1000);
+
     }
 
     private void loadNotes() {
@@ -180,8 +208,17 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(this,SettingsActivity.class));
             return true;
         }
+        else if(id==R.id.backup_notes) {
+            backupNotes();
+        }
         return super.onOptionsItemSelected(item);
 
+    }
+
+    private void backupNotes() {
+        Intent intent = new Intent(this,NoteBackupService.class);
+        intent.putExtra(NoteBackupService.EXTRA_COURSE_ID,NoteBackup.ALL_COURSES);
+        startService(intent);
     }
 
     @Override
